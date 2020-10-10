@@ -142,7 +142,7 @@ ggsave("problem2_plot.png", height = 4, width = 6)
 Except for Sunday, Most of the activity is higher during the latter half of the day. It appears that on Fridays the activity counts were the highest among all days for the later half of the day. On Sunday the activity is high towards the middle of the day. 
 
 
-##Problem 3
+## Problem 3
 
 ```{r}
 library(p8105.datasets)
@@ -150,7 +150,7 @@ data("ny_noaa")
 
 ```
 
-###Description of the data
+### Description of the data
 
 The dataset has `r nrow(ny_noaa)` rows (observations) and `r ncol(ny_noaa)` columns. The variables included are `r variable.names(ny_noaa)`. It has information about the weather including precipitation, snowfall, snow depth, maximum and minimum temperatures observed on different dates. 
 
@@ -185,7 +185,17 @@ The most commonly observed value is 0 mm. This is because for most of the time i
  
 
 
+```{r}
+pl = ny_noaa_clean %>%
+  filter(month %in% c(1,7)) %>%
+  group_by(id,year,month) %>%
+  summarize(mean_tmax = mean(tmax,na.rm=TRUE))
 
+ggplot(pl,aes(x = year, y = mean_tmax)) +geom_point(aes(colour = id),alpha = 0.5) + geom_smooth() +facet_grid(. ~month)
+
+ggsave("problem3_plot2.png")
+
+```
 
 
 
