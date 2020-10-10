@@ -124,16 +124,19 @@ He tends to have more physical activity during the weekdays than the weekends fo
 
 
 ```{r}
-accelero_data %>%
-ggplot(aes(x = minute_of_the_day, y = activity_count, color = day, )) + stat_smooth(se=FALSE) +
-labs(
-    title = "Activity time courses per day",
+  accelero_data %>%
+  ggplot(aes(x = minute_of_the_day, y = activity_count, color = day, )) + stat_smooth(se=FALSE) +
+  labs(
+      title = "Activity time courses per day",
     x = "Minute of the day",
     y = "Activity count",
     caption = "Data from Advanced Cardiac Care Center of Columbia University Medical Center"
   ) +
   theme(legend.position = "bottom")
-  
+
+ggsave("problem2_plot.pdf", height = 4, width = 6)  
+ggsave("problem2_plot.png", height = 4, width = 6)  
+
 ```
 
 Except for Sunday, Most of the activity is higher during the latter half of the day. It appears that on Fridays the activity counts were the highest among all days for the later half of the day. On Sunday the activity is high towards the middle of the day. 
