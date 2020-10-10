@@ -100,6 +100,9 @@ accelero_data = janitor::clean_names(accelero_data) %>%
   separate(activity_for_minute, c("word", "minute_of_the_day"), "_") %>%
   select(-word) %>%
   mutate(
+    minute_of_the_day = as.numeric(minute_of_the_day)
+  ) %>%
+  mutate(
     day = factor(day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
         )%>%
   mutate(day_type = case_when(day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~ "Weekday",
@@ -120,6 +123,19 @@ accelero_data %>%
 He tends to have more physical activity during the weekdays than the weekends for the first couple of weeks. Later his activity on weekends increases. However, during the Saturdays of the 4th and 5th weeks, he had barely any activity. They could have been rest days. 
 
 
+```{r}
+accelero_data %>%
+ggplot(aes(x = minute_of_the_day, y = activity_count, color = day, )) + stat_smooth(se=FALSE) +
+labs(
+    title = "Activity time courses per day",
+    x = "Minute of the day",
+    y = "Activity count",
+    caption = "Data from Advanced Cardiac Care Center of Columbia University Medical Center"
+  ) +
+  theme(legend.position = "bottom")
+  
+```
 
+Except for Sunday, Most of the activity is higher during the latter half of the day. It appears that on Fridays the activity counts were the highest among all days for the later half of the day. On Sunday the activity is high towards the middle of the day. 
 
 
