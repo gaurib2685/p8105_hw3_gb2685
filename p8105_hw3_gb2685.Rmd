@@ -1,0 +1,111 @@
+---
+title: "Homework 3"
+author: "Gauri Bhatkhande"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(p8105.datasets)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "botttom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+## Problem 1
+
+```{r}
+data("instacart")
+```
+This dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. 
+
+Observations are the level of items in orders by user. There are user/order variables -- and item variables. `r variable.names(instacart)`
+
+How many aisles and which are most items from? 
+```{r}
+instacart %>%
+  count(aisle) %>%
+  arrange(desc(n))
+```
+Lets make a plot 
+
+```{r}
+instacart %>%
+  count(aisle) %>%
+  filter(n > 10000) %>% 
+  mutate(
+    aisle = factor(aisle), 
+    aisle = fct_reorder(aisle, n)
+  )%>%
+  ggplot(aes(x = aisle, y = n)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+Lets make a table 
+
+```{r}
+instacart %>%
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>%
+  group_by(aisle) %>%
+  count(product_name) %>%
+  mutate(rank = min_rank(desc(n))) %>%
+  filter(rank < 4) %>%
+  arrange(aisle, rank) %>%
+    knitr::kable()
+```
+Apples vs ice cream 
+
+```{r}
+instacart %>%
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream"))%>%
+  group_by(product_name, order_dow) %>%
+  summarize(mean_hour = mean(order_hour_of_day)) %>%
+pivot_wider(
+  names_from = order_dow, 
+  values_from = mean_hour
+)
+```
+
+## Problem 2
+
+Loading the dataset
+```{r}
+accelero_data = read_csv(file = "./Data/accel_data.csv")
+```
+
+Tidying the dataset 
+```{r}
+accelero_data = janitor::clean_names(accelero_data) %>%
+                pivot_longer(
+                   activity_1:activity_1440,
+                   names_to = "activity_for_minute",
+                   values_to = "activity_count") %>%
+  separate(activity_for_minute, c("word", "minute_of_the_day"), "_") %>%
+  select(-word) %>%
+  mutate(
+    day = factor(day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+        )%>%
+  mutate(day_type = case_when(day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~ "Weekday",
+                              day %in% c("Saturday", "Sunday") ~ "Weekend")
+        )
+accelero_data
+```
+The variables in the data are `r variable.names(accelero_data)`. There are `r nrow(accelero_data)` rows (observations) and `r ncol(accelero_data)` columns in the dataset. The number of rows or observations signifies activity count for each minute of the day for each day of the week for 5 weeks (35 days). 
+
+
