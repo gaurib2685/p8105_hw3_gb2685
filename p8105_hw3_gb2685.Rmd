@@ -89,7 +89,8 @@ Loading the dataset
 accelero_data = read_csv(file = "./Data/accel_data.csv")
 ```
 
-Tidying and wrangling the dataset 
+Tidying and wrangling the dataset
+
 ```{r}
 accelero_data = janitor::clean_names(accelero_data) %>%
                 pivot_longer(
@@ -109,6 +110,7 @@ accelero_data
 The variables in the data are `r variable.names(accelero_data)`. There are `r nrow(accelero_data)` rows (observations) and `r ncol(accelero_data)` columns in the dataset. The number of rows or observations signifies activity count for each minute of the day for each day of the week for 5 weeks (35 days). 
 
 Making a table of total activity for each day of the week
+
 ```{r}
 accelero_data %>%
   group_by(week, day) %>%
@@ -116,6 +118,7 @@ accelero_data %>%
  knitr::kable()
 ```
 He tends to have more physical activity during the weekdays than the weekends for the first couple of weeks. Later his activity on weekends increases. However, during the Saturdays of the 4th and 5th weeks, he had barely any activity. They could have been rest days. 
+
 
 
 
