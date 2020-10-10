@@ -142,3 +142,56 @@ ggsave("problem2_plot.png", height = 4, width = 6)
 Except for Sunday, Most of the activity is higher during the latter half of the day. It appears that on Fridays the activity counts were the highest among all days for the later half of the day. On Sunday the activity is high towards the middle of the day. 
 
 
+##Problem 3
+
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+
+```
+
+###Description of the data
+
+The dataset has `r nrow(ny_noaa)` rows (observations) and `r ncol(ny_noaa)` columns. The variables included are `r variable.names(ny_noaa)`. It has information about the weather including precipitation, snowfall, snow depth, maximum and minimum temperatures observed on different dates. 
+
+**Data cleaning and Creating separate variables for year, month, date. Ensuring observations are in reasonable units.**
+
+```{r}
+ny_noaa_clean = janitor::clean_names(ny_noaa) %>%
+separate (date, c("year", "month", "date"), "-") %>%
+  mutate(
+    tmin = as.numeric(tmin), 
+    tmax = as.numeric(tmax), 
+    year = as.numeric(year),
+    month = as.numeric(month),
+    date = as.numeric(date)) %>%
+  mutate(
+    prcp = prcp/10,
+    tmax = tmax/10,
+    tmin = tmin/10 )
+
+head(ny_noaa_clean)
+```
+**For snowfall, to find the most commonly observed values? Why?**
+
+```{r}
+ny_noaa_clean %>%
+  count(snow, sort = TRUE )%>%
+  slice (1:5)
+  
+```
+
+The most commonly observed value is 0 mm. This is because for most of the time in the year, it does not snow and hence it is 0 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
