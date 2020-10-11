@@ -229,16 +229,21 @@ The fluctuating temperatures in January and the warmer temperatures in July are 
 
 plot1 = ggplot(ny_noaa_clean, aes(x=tmin,y=tmax) ) + 
         geom_hex() +
-        theme(legend.position = "right")
+        theme(legend.position = "right") +
+        labs(
+          title = "tmax vs tmin"
+  )
+  
 
 plot2 = ny_noaa_clean %>%
         filter(snow>0, snow<100) %>%
         ggplot( aes(x = year, y = snow)) + 
-        geom_violin(aes(group = year)) 
+        geom_violin(aes(group = year)) +
+        labs(
+          title = "Distribution of snowfall across the years"
+  )
 
-patch = plot1 / plot2
-
-patch
+plot1 / plot2
 
 ggsave("patch_plots.png")
 ```
