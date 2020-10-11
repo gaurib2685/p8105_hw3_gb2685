@@ -9,6 +9,7 @@ editor_options:
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(p8105.datasets)
+library (patchwork)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -84,12 +85,13 @@ pivot_wider(
 
 ## Problem 2
 
-Loading the dataset
+**Loading the dataset**
+
 ```{r}
 accelero_data = read_csv(file = "./Data/accel_data.csv")
 ```
 
-Tidying and wrangling the dataset
+**Tidying and wrangling the dataset**
 
 ```{r}
 accelero_data = janitor::clean_names(accelero_data) %>%
@@ -110,9 +112,16 @@ accelero_data = janitor::clean_names(accelero_data) %>%
         )
 accelero_data
 ```
-The variables in the data are `r variable.names(accelero_data)`. There are `r nrow(accelero_data)` rows (observations) and `r ncol(accelero_data)` columns in the dataset. The number of rows or observations signifies activity count for each minute of the day for each day of the week for 5 weeks (35 days). 
+The variables in the data are `r variable.names(accelero_data)`. There are `r nrow(accelero_data)` rows (observations) and `r ncol(accelero_data)` columns in the dataset. The number of rows or observations signifies activity count for each minute of the day for each day of the week for 5 weeks (35 days).
+The variables are described below: 
+Week : week number
+day_id: unique id for each day
+day: days in the week 
+minute_of_the_day: the time point of every minute of the day
+activity_count: activity count for every minute 
+day_type (newly created): whether the day is a weekday or weekend
 
-Making a table of total activity for each day of the week
+**Making a table of total activity for each day of the week**
 
 ```{r}
 accelero_data %>%
@@ -123,7 +132,7 @@ accelero_data %>%
 He tends to have more physical activity during the weekdays than the weekends for the first couple of weeks. Later his activity on weekends increases. However, during the Saturdays of the 4th and 5th weeks, he had barely any activity. They could have been rest days. 
 
 
-Making a plot for the activity time course per day
+**Making a plot for the activity time course per day**
 ```{r}
 accelero_data %>%
   ggplot(aes(x = minute_of_the_day, y = activity_count, color = day)) + geom_line() +
@@ -136,11 +145,12 @@ accelero_data %>%
   theme(legend.position = "bottom")
 ```
 
-
 Except for Sunday, Most of the activity is higher during the latter half of the day. It appears that on Fridays the activity counts were the highest among all days for the later half of the day. On Sunday the activity is high towards the middle of the day. 
 
 
 ## Problem 3
+
+**Loading the data from the package**
 
 ```{r}
 library(p8105.datasets)
@@ -157,7 +167,8 @@ The dataset has `r nrow(ny_noaa)` rows (observations) and `r ncol(ny_noaa)` colu
 summary(ny_noaa)
 
 ```
-The missing values should be taken into consideration before making the ggplots 
+
+There are a large number of missing values in each variable as seen from the summary. It can cause us to miss some information that would have been otherwise important. The missing values should be taken into consideration before making the ggplots. As also seen later, the second most commonly observed value of snow is actually NA and this could have influenced how we currently see the snowfall trend. 
 
 **Data cleaning and Creating separate variables for year, month, date. Ensuring observations are in reasonable units.**
 
@@ -177,7 +188,7 @@ separate (date, c("year", "month", "date"), "-") %>%
 
 head(ny_noaa_clean)
 ```
-**For snowfall, to find the most commonly observed values? Why?**
+**For snowfall, to find the most commonly observed values**
 
 ```{r}
 ny_noaa_clean %>%
@@ -186,10 +197,10 @@ ny_noaa_clean %>%
   
 ```
 
-The most commonly observed value is 0 mm. This is because for most of the time in the year, it does not snow and hence it is 0. The three most commonly observed values are 25 (31022), 13 (23095), 51 (18274) (when we don't consider the times when there was no snowfall (0) and missing values (NA)).
+The most commonly observed value is 0 mm. This is because for most of the time in the year, it does not snow and hence it is 0. The next three most commonly observed values are 25 (31022), 13 (23095), 51 (18274) (when we don't consider the times when there was no snowfall (0) and missing values (NA)).
  
 
-Creating plot showing the average max temperature in January and in July in each station across years
+**Creating plot showing the average max temperature in January and in July in each station across years.**
 
 ```{r}
 p3_plot1 = ny_noaa_clean %>%
@@ -199,7 +210,9 @@ p3_plot1 = ny_noaa_clean %>%
 
   ggplot(p3_plot1,aes(x = year, y = mean_tmax)) +
   geom_point(aes(colour = id),alpha = 0.5) + 
-  geom_smooth() +facet_grid(. ~month)
+  geom_smooth() + 
+  facet_grid(. ~month) 
+  
 
 ggsave("problem3_plot1.png")
 
@@ -213,14 +226,21 @@ The fluctuating temperatures in January and the warmer temperatures in July are 
 **Making a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii)  a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year. Used patchwork**
 
 ```{r}
-library (patchwork)
-plot1 = ggplot(ny_noaa_clean, aes(x=tmin,y=tmax) ) + geom_hex()
+
+plot1 = ggplot(ny_noaa_clean, aes(x=tmin,y=tmax) ) + 
+        geom_hex() +
+        theme(legend.position = "right")
 
 plot2 = ny_noaa_clean %>%
         filter(snow>0, snow<100) %>%
-        ggplot( aes(x = year, y = snow)) + geom_violin(aes(group = year))
+        ggplot( aes(x = year, y = snow)) + 
+        geom_violin(aes(group = year)) 
 
-plot1 / plot2
+patch = plot1 / plot2
+
+patch
+
+ggsave("patch_plots.png")
 ```
 
 
